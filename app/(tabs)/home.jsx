@@ -15,18 +15,17 @@ const Home = () => {
   const {data: posts, refetch} = useAppwrite(getAllPosts);
   const {data: latestPosts} = useAppwrite(getLatestPosts);
 
-  const[refershing, setRefereshing] = useState(false);
+  const[refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async() => {
-    setRefereshing(true);
+    setRefreshing(true);
     await refetch();
-    setRefereshing(false);
+    setRefreshing(false);
   }
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
-        // data={[{ id: 1 }, { id: 2 }, { id: 3 }]}
         data={posts} 
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
@@ -67,7 +66,7 @@ const Home = () => {
           <EmptyState title="No Videos found"
           subtitle="Be the first one to upload a video"/>
         )}
-        refreshControl={<RefreshControl refershing={refershing} onRefresh={onRefresh}/>}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
       />
     </SafeAreaView>
   );

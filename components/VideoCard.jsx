@@ -1,17 +1,49 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { icons } from "../constants";
 import { ResizeMode, Video } from "expo-av";
+import { useGlobalContext } from "../context/GlobalProvider";
+import { getLikesForVideo, likeVideo, unlikeVideo } from "../lib/appwrite";
+
+// $id -->
+// In the context of the VideoCard component, $id is used to uniquely identify each video. This is necessary when performing actions on a specific video, such as liking or unliking it. It ensures that the action affects the correct video document in the database.
+
+// user.$id -->
+// user.$id is used to identify the logged-in user who is performing an action, such as liking or unliking a video. This user ID is necessary to record which user liked a video and to ensure that each user can only like a video once.
 
 const VideoCard = ({
   video: {
+    $id,
     title,
     thumbnail,
     video,
     creator: { username, avatar },
   },
+  showHeart = true,
 }) => {
   const [play, setPlay] = useState(false);
+  const { user } = useGlobalContext();
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      const likes = await getLikesForVideo($id);
+      const likedByUser = likes.includes(user.$id);
+      setIsLiked(likedByUser);
+    };
+
+    fetchLikes();
+  }, [$id, user.$id]);
+
+  const handleLike = async () => {
+    if (isLiked) {
+      await unlikeVideo($id, user.$id);
+    } else {
+      await likeVideo($id, user.$id);
+    }
+    setIsLiked(!isLiked);
+  };
+
   return (
     <View className="flex flex-col items-center px-4 mb-14">
       <View className="flex flex-row gap-3 items-start w-full">
@@ -39,9 +71,19 @@ const VideoCard = ({
           </View>
         </View>
 
-        <View className="pt-2">
-          <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" />
-        </View>
+        {showHeart && (
+          <View className="pt-2">
+            {/* <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" /> */}
+            <TouchableOpacity onPress={handleLike}>
+              <Image
+                source={isLiked ? icons.heartFilled : icons.heartOutline}
+                className="w-6 h-6"
+                resizeMode="contain"
+                style={{ tintColor: isLiked ? "red" : "white" }}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       {play ? (
         <Video

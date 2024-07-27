@@ -11,6 +11,8 @@ import logout from "../assets/icons/logout.png";
 import eyeHide from "../assets/icons/eye-hide.png";
 import eye from "../assets/icons/eye.png";
 import play from "../assets/icons/play.png";
+import heartFilled from "../assets/icons/heartFilled.png"
+import heartOutline from "../assets/icons/heartOutline.png"
 
 export default {
   play,
@@ -26,4 +28,6 @@ export default {
   logout,
   eyeHide,
   eye,
+  heartFilled,
+  heartOutline
 };
